@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Prediction Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: pink;
+            text-align: center;
+        }
+        .result-table {
+            margin: 0 auto;
+            width: 60%;
+            border: 4px solid;
+            border-image: linear-gradient(90deg, red, green, blue) 1;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: white;
+        }
+        .timer {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        .period-number {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Income Prediction Results</h1>
+    
+    <div class="result-table">
+        <div class="timer" id="timer30s">00 : 00</div>
+        <div class="period-number" id="period30s">Period: 000000000</div>
+        <table id="result-history">
+            <thead>
+                <tr>
+                    <th>Period Number</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Result history will be appended here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const resultPattern = ['BIG', 'SMALL', 'SMALL', 'SMALL', 'SMALL', 'BIG', 'SMALL', 'BIG', 'SMALL', 'BIG', 'SMALL', 'BIG'];
+        let currentPeriodIndex = 0;
+
+        // Java Timer Equivalent using JavaScript
+        setInterval(function () {
+            const calendar = new Date();
+            const seconds = calendar.getSeconds();
+            const remainingSeconds = 30 - (seconds % 30); // Adjust for 30-second interval
+            const minutes = calendar.getMinutes();
+            const totalMinutes = calendar.getHours() * 60 + minutes;
+
+            // Update period number for 30-second interval
+            const periodNumber = calendar.getFullYear().toString() + 
+                (calendar.getMonth() + 1).toString().padStart(2, '0') + 
+                calendar.getDate().toString().padStart(2, '0') +
+                "30" + (1 + totalMinutes * 2 + (seconds >= 30 ? 1 : 0));
+            document.getElementById("period30s").textContent = "Period: " + periodNumber;
+
+            // Update timer in format " x x : x x"
+            const formattedTime = String(remainingSeconds).padStart(2, '0').split("").join(" ");
+            document.getElementById("timer30s").textContent = "  00  :  " + formattedTime;
+
+            // Display random result when period number changes
+            if (seconds % 30 === 0) {
+                const result = resultPattern[currentPeriodIndex];
+                appendResultHistory(periodNumber, result);
+
+                // Cycle through the result pattern
+                currentPeriodIndex = (currentPeriodIndex + 1) % resultPattern.length;
+            }
+        }, 1000); // Update every second
+
+        // Function to append result to history table
+        function appendResultHistory(periodNumber, result) {
+            const tbody = document.querySelector("#result-history tbody");
+            const row = document.createElement("tr");
+            const periodCell = document.createElement("td");
+            const resultCell = document.createElement("td");
+
+            periodCell.textContent = periodNumber;
+            resultCell.textContent = result;
+
+            row.appendChild(periodCell);
+            row.appendChild(resultCell);
+            tbody.appendChild(row);
+        }
+    </script>
+
+</body>
+</html>
